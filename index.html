@@ -48,7 +48,7 @@ textarea{width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;f
 table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;font-size:13.5px}
 th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}th{font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--mut);background:#f6f9fd;cursor:pointer;white-space:nowrap}
 td .h{color:var(--mut);font-size:12px}.num{white-space:nowrap;font-weight:600}
-.done{display:inline-block;background:var(--btn);color:#fff;border-radius:999px;padding:2px 9px;font-size:11.5px;font-weight:600;text-decoration:none}
+.done{display:inline-block;white-space:nowrap;background:var(--btn);color:#fff;border-radius:999px;padding:2px 9px;font-size:11.5px;font-weight:600;text-decoration:none}
 input.s{border:1px solid var(--line);border-radius:999px;padding:7px 12px;font:inherit;font-size:13px;min-width:220px}
 .flab{font-size:12px;color:var(--mut);align-self:center;margin-right:2px;font-weight:600}
 @media(max-width:700px){.hide-m{display:none}}
@@ -57,7 +57,7 @@ input.s{border:1px solid var(--line);border-radius:999px;padding:7px 12px;font:i
 <main class="wrap" id="app"></main>
 
 <script>
-function av(hd,nm,s){s=s||36;const L=esc(((nm||hd||'?').trim()[0]||'?').toUpperCase());return`<span class="av" style="width:${s}px;height:${s}px;font-size:${Math.round(s*.42)}px;background-image:url('avatars/${encodeURIComponent(hd)}.jpg'),url('https://costa0001.github.io/reels-analytics/avatars/${encodeURIComponent(hd)}.jpg')">${L}</span>`}
+function av(hd,nm,s){s=s||36;const L=esc(((nm||hd||'?').trim()[0]||'?').toUpperCase());return`<span class="av" style="width:${s}px;height:${s}px;font-size:${Math.round(s*.42)}px;background-image:url('avatars/${encodeURIComponent(hd)}.jpg'),url('https://costa0001.github.io/reels-analytics/avatars/${encodeURIComponent(hd)}.jpg')"></span>`}
 let D,B,analyzed,bmap;
 try{const m=JSON.parse(localStorage.getItem('reels_marks')||'{}');if(m&&typeof m==='object')Object.assign(window,{_lm:m})}catch(e){}
 function prep(){
@@ -94,7 +94,7 @@ function renderBloggers(){
  <div class="filters"><span class="flab">Язык:</span>${LANG.map(([k,l])=>`<button class="chip ${bf.lang===k?'on':''}" data-l="${k}">${l} · ${cnt(k)}</button>`).join('')}</div>
  <div class="filters"><span class="flab">Подписчики:</span>${SUBS.map(([k,l])=>`<button class="chip ${bf.subs===k?'on':''}" data-s="${k}">${l}</button>`).join('')}</div>
  <div class="filters"><input class="s" id="q" placeholder="Поиск по имени, нику, нише" value="${esc(bf.q)}"><span class="flab" style="margin-left:8px">Сортировка:</span><button class="chip ${bf.sort==='n'?'on':''}" data-o="n">как в списке</button><button class="chip ${bf.sort==='subs'?'on':''}" data-o="subs">по подписчикам</button><span class="counts" style="align-self:center">Найдено: ${L.length}</span></div>
- <table><thead><tr><th>№</th><th>Блогер</th><th>Подписчики</th><th class="hide-m">Ниша</th><th class="hide-m">Что продаёт</th><th>Разбор</th></tr></thead><tbody>
+ <table><thead><tr><th style="width:44px">№</th><th>Блогер</th><th style="width:92px">Подписчики</th><th class="hide-m">Ниша</th><th class="hide-m">Что продаёт</th><th style="width:96px">Разбор</th></tr></thead><tbody>
  ${L.map(b=>{const has=analyzed.has(b.handle.toLowerCase());return`<tr><td class="h">${b.market} ${b.n}</td><td><div class="avrow">${av(b.handle,b.name,38)}<div><b>${esc(b.name)}</b><br><a class="ext" href="${esc(b.url)}" target="_blank" rel="noopener">@${esc(b.handle)}</a> <span class="h">${b.platform!=='Instagram'?esc(b.platform):''}</span></div></div></td><td class="num">${esc(b.subs_text)}</td><td class="hide-m">${esc(b.niche)}<br><span class="h">${b.close==='прямая'?'прямая ниша':'смежная ниша'}</span></td><td class="hide-m h">${esc(b.sells)}</td><td>${has?`<a class="done" href="#e-${esc(b.handle)}">готов →</a>`:'<span class="h">—</span>'}</td></tr>`}).join('')}
  </tbody></table><p class="note">Подписчики — из твоей таблицы (у англоязычных часто диапазон; фильтр берёт нижнюю границу).</p>`;
  app.querySelectorAll('[data-l]').forEach(x=>x.onclick=()=>{bf.lang=x.dataset.l;renderBloggers()});
