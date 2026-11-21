@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Аналитика Reels</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f1f6fc;--card:#fff;--ink:#14213d;--mut:#5f6b80;--line:#dde6f1;--acc:#0b2a5b;--accbg:#e3ecf8;--hl:#fff3a8;--warn:#eaf2fc;--warnink:#0b2a5b;--btn:#0b2a5b}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14.5px/1.5 Inter,system-ui,sans-serif}
+header{position:sticky;top:0;z-index:5;background:rgba(241,246,252,.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+.wrap{max-width:980px;margin:0 auto;padding:0 18px}
+.top{display:flex;align-items:center;gap:18px;height:56px}.brand{font-weight:800;letter-spacing:-.02em;font-size:17px}
+nav{display:flex;gap:4px}nav a{padding:7px 13px;border-radius:999px;color:var(--mut);text-decoration:none;font-weight:600}
+nav a.on{background:var(--btn);color:#fff}
+h1{font-size:30px;letter-spacing:-.03em;margin:28px 0 4px;font-weight:800}h2{font-size:20px;margin:30px 0 12px;letter-spacing:-.02em}
+.sub{color:var(--mut);margin:0 0 18px;max-width:700px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
+.exp{cursor:pointer;transition:.15s}.exp:hover{border-color:#0b2a5b}
+.exp h3{margin:0;font-size:17px}.handle{color:var(--mut);font-size:13px}
+.stats{display:flex;gap:16px;margin:12px 0 0;flex-wrap:wrap}.stat b{display:block;font-size:17px}.stat span{font-size:11.5px;color:var(--mut)}
+.box{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin:10px 0}
+.box h4{margin:0 0 6px;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut)}
+.lesson{background:var(--warn);border-color:#c9daf0}
+.reel{display:grid;grid-template-columns:46px 1fr;gap:12px}
+.rank{font-weight:800;font-size:22px;color:#b7c6dc}.rt{font-weight:700;font-size:16px;margin:0}
+.meta{display:flex;gap:10px;flex-wrap:wrap;font-size:12.5px;color:var(--mut);margin:4px 0 8px}
+.pill{display:inline-block;font-size:11.5px;padding:2px 8px;border-radius:999px;background:#eef2f8;color:#3f4a5e;margin:0 4px 4px 0}
+.pill.g{background:var(--accbg);color:var(--acc)}.pill.hot{background:#0b2a5b;color:#fff;font-weight:600}
+.hook{background:var(--hl);padding:2px 4px;font-weight:600}
+details summary{cursor:pointer;color:var(--acc);font-weight:600;font-size:13px;margin-top:6px}
+.lbl{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--mut);margin:12px 0 2px;font-weight:600}
+.tr{font-size:13px;color:#3a4458;background:#f6f9fd;border-radius:8px;padding:10px;max-height:240px;overflow:auto}
+a.ext{color:var(--acc);font-size:12.5px;font-weight:600;text-decoration:none}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 16px}
+.chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;font:inherit;font-size:13px;cursor:pointer}
+.chip.on{background:var(--btn);color:#fff;border-color:var(--btn)}
+.core h3{margin:0 0 4px;font-size:17px}.core p{margin:6px 0}
+.btns{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0 8px}
+.btns button{border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 11px;font:inherit;font-size:13px;cursor:pointer}
+.btns button.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.btns button.on.no{background:#7d8aa3;border-color:#7d8aa3}
+textarea{width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit;font-size:13px;min-height:38px;resize:vertical;background:#fbfdff}
+.saved{font-size:12px;color:var(--acc);height:16px}
+.note{font-size:12.5px;color:var(--mut);margin:30px 0 40px}
+.back{color:var(--mut);cursor:pointer;font-weight:600;font-size:13px;margin-top:18px;display:inline-block}
+.counts{font-size:13px;color:var(--mut)}
+@media(max-width:600px){h1{font-size:24px}.reel{grid-template-columns:1fr}.rank{font-size:16px}}
+table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;font-size:13.5px}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}th{font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--mut);background:#f6f9fd;cursor:pointer;white-space:nowrap}
+td .h{color:var(--mut);font-size:12px}.num{white-space:nowrap;font-weight:600}
+.done{display:inline-block;background:var(--btn);color:#fff;border-radius:999px;padding:2px 9px;font-size:11.5px;font-weight:600;text-decoration:none}
+input.s{border:1px solid var(--line);border-radius:999px;padding:7px 12px;font:inherit;font-size:13px;min-width:220px}
+.flab{font-size:12px;color:var(--mut);align-self:center;margin-right:2px;font-weight:600}
+@media(max-width:700px){.hide-m{display:none}}
+</style></head><body>
+<header><div class="wrap top"><div class="brand">Аналитика Reels</div><nav><a href="#blogery" id="n0">Блогеры</a><a href="#razbory" id="n1">Разборы</a><a href="#yadra" id="n2">Библиотека ядер</a></nav></div></header>
+<main class="wrap" id="app"></main>
+
+<script>
+let D,B,analyzed,bmap;
+try{const m=JSON.parse(localStorage.getItem('reels_marks')||'{}');if(m&&typeof m==='object')Object.assign(window,{_lm:m})}catch(e){}
+function prep(){
+analyzed=new Set(D.experts.map(e=>e.handle.toLowerCase()));
+bmap=Object.fromEntries(B.map(b=>[b.handle.toLowerCase(),b]));
+D.experts.forEach(e=>{const b=bmap[e.handle.toLowerCase()];e.lang=b?(b.market==='EN'?'en':b.market==='UA'?'ua':'ru'):'en';e.subs_text=b?b.subs_text:''});
+D.experts.forEach(e=>{e.median=med(e.reels.map(r=>r.plays));e.reels.forEach(r=>{r.expert=e.name;r.handle=e.handle;r.x=r.plays/e.median;r.cpm=(r.comments||0)/r.plays*1000})});
+}
+
+
+
+
+const fmt=n=>n>=1e6?(n/1e6).toFixed(1).replace('.',',')+' млн':n>=1e3?Math.round(n/1e3)+' тыс':String(n);
+const ok=s=>s&&s.trim()&&s.trim()!=='—';
+const esc=s=>String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const med=a=>{const s=[...a].sort((x,y)=>x-y);const m=s.length>>1;return s.length%2?s[m]:(s[m-1]+s[m])/2};
+
+let marks=(window._lm||{}),db=null,uid=null,cur={expert:null,filt:'all',lang:'all',verdict:'all'};
+const V=[['take','Беру'],['notmine','Ядро, но не моё'],['notcore','Не ядро'],['done','Уже снимал']];
+const app=document.getElementById('app');
+function route(){const h=location.hash.slice(1)||'blogery';document.getElementById('n0').className=h==='blogery'?'on':'';document.getElementById('n1').className=h==='razbory'||h.startsWith('e-')?'on':'';document.getElementById('n2').className=h==='yadra'?'on':'';
+ if(h==='yadra')return renderCores(); const m=h.match(/^e-([\w.-]+)/); if(m)return renderExpert(m[1]); if(h==='razbory'){renderHome();return window.scrollTo(0,0)} renderBloggers()}
+let bf={lang:'all',subs:'all',q:'',sort:'n'};
+const LANG=[['all','Все'],['ru','Русскоязычные'],['ua','Украиноязычные'],['en','Англоязычные']];
+const SUBS=[['all','Любое'],['0','до 100 тыс'],['1','100–500 тыс'],['2','500 тыс – 1 млн'],['3','1–5 млн'],['4','5 млн+']];
+const subsBand=n=>n==null?-1:n<1e5?0:n<5e5?1:n<1e6?2:n<5e6?3:4;
+const langOf=b=>b.market==='EN'?'en':b.market==='UA'?'ua':'ru';
+function renderBloggers(){
+ let L=B.filter(b=>bf.lang==='all'||langOf(b)===bf.lang).filter(b=>bf.subs==='all'||subsBand(b.subs)===+bf.subs);
+ if(bf.q){const q=bf.q.toLowerCase();L=L.filter(b=>(b.name+' '+b.handle+' '+b.niche+' '+b.sells).toLowerCase().includes(q))}
+ if(bf.sort==='subs')L=[...L].sort((a,b)=>(b.subs||0)-(a.subs||0));
+ const cnt=k=>B.filter(b=>k==='all'||langOf(b)===k).length;
+ app.innerHTML=`<h1>Блогеры для анализа</h1><p class="sub">${B.length} аккаунтов: ${cnt('ru')} русскоязычных, ${cnt('ua')} украиноязычных, ${cnt('en')} англоязычных. Зелёная отметка — разбор рилсов уже готов.</p>
+ <div class="filters"><span class="flab">Язык:</span>${LANG.map(([k,l])=>`<button class="chip ${bf.lang===k?'on':''}" data-l="${k}">${l} · ${cnt(k)}</button>`).join('')}</div>
+ <div class="filters"><span class="flab">Подписчики:</span>${SUBS.map(([k,l])=>`<button class="chip ${bf.subs===k?'on':''}" data-s="${k}">${l}</button>`).join('')}</div>
+ <div class="filters"><input class="s" id="q" placeholder="Поиск по имени, нику, нише" value="${esc(bf.q)}"><span class="flab" style="margin-left:8px">Сортировка:</span><button class="chip ${bf.sort==='n'?'on':''}" data-o="n">как в списке</button><button class="chip ${bf.sort==='subs'?'on':''}" data-o="subs">по подписчикам</button><span class="counts" style="align-self:center">Найдено: ${L.length}</span></div>
+ <table><thead><tr><th>№</th><th>Блогер</th><th>Подписчики</th><th class="hide-m">Ниша</th><th class="hide-m">Что продаёт</th><th>Разбор</th></tr></thead><tbody>
+ ${L.map(b=>{const has=analyzed.has(b.handle.toLowerCase());return`<tr><td class="h">${b.market} ${b.n}</td><td><b>${esc(b.name)}</b><br><a class="ext" href="${esc(b.url)}" target="_blank" rel="noopener">@${esc(b.handle)}</a> <span class="h">${b.platform!=='Instagram'?esc(b.platform):''}</span></td><td class="num">${esc(b.subs_text)}</td><td class="hide-m">${esc(b.niche)}<br><span class="h">${b.close==='прямая'?'прямая ниша':'смежная ниша'}</span></td><td class="hide-m h">${esc(b.sells)}</td><td>${has?`<a class="done" href="#e-${esc(b.handle)}">готов →</a>`:'<span class="h">—</span>'}</td></tr>`}).join('')}
+ </tbody></table><p class="note">Подписчики — из твоей таблицы (у англоязычных часто диапазон; фильтр берёт нижнюю границу).</p>`;
+ app.querySelectorAll('[data-l]').forEach(x=>x.onclick=()=>{bf.lang=x.dataset.l;renderBloggers()});
+ app.querySelectorAll('[data-s]').forEach(x=>x.onclick=()=>{bf.subs=x.dataset.s;renderBloggers()});
+ app.querySelectorAll('[data-o]').forEach(x=>x.onclick=()=>{bf.sort=x.dataset.o;renderBloggers()});
+ const q=document.getElementById('q');q.oninput=()=>{bf.q=q.value;const p=q.selectionStart;renderBloggers();const n=document.getElementById('q');n.focus();n.setSelectionRange(p,p)};
+}
+function card(e){{const top=[...e.reels].sort((a,b)=>b.plays-a.plays)[0];const hits=e.reels.filter(r=>r.x>=2).length;return`<div class="card exp" onclick="location.hash='e-${e.handle}'"><h3>${esc(e.name)}</h3><div class="handle">@${e.handle} · ${esc(e.subs_text)} подп. · ${esc(e.sample)}</div><p style="margin:10px 0 0;font-size:13.5px">${esc(e.about)}</p><div class="stats"><div class="stat"><b>${fmt(e.median)}</b><span>медиана просмотров</span></div><div class="stat"><b>${hits} из ${e.reels.length}</b><span>залётов (×2 к медиане)</span></div><div class="stat"><b>${fmt(top.plays)}</b><span>лучший рилс</span></div></div></div>`}}
+function renderHome(){const g=(l,t)=>{const L=D.experts.filter(e=>e.lang===l);return L.length?`<h2>${t} · ${L.length}</h2><div class="grid">${L.map(card).join('')}</div>`:''};app.innerHTML=`<h1>Разборы</h1><p class="sub">Эксперты, их рилсы в Instagram и разбор: что залетает, почему и какое ядро можно забрать себе.</p>${g('ru','Русскоязычные')}${g('ua','Украиноязычные')}${g('en','Англоязычные')}<p class="note">Цифры — публичные данные Instagram на 20.11.2026. «×» — во сколько раз рилс выше медианы выборки (у топ-10 сравнение внутри десятки). Тексты расшифрованы из звука автоматически, возможны неточности.</p>`}
+function reelCard(r,i){const hot=r.x>=2?`<span class="pill hot">×${r.x.toFixed(1)} к медиане</span>`:`<span class="pill">×${r.x.toFixed(1)}</span>`;
+ return`<div class="box reel"><div class="rank">№${i+1}</div><div><p class="rt">${esc(r.title)}</p><div class="meta"><span><b>${fmt(r.plays)}</b> просм.</span><span>${r.likes<50&&r.plays>1e5?'лайки скрыты':fmt(r.likes)+' лайков'}</span><span>${fmt(r.comments||0)} комм.</span><span>${r.dur} с</span><span>${r.date}</span></div>${hot}<span class="pill">${esc(r.format)}</span>${r.tags.map(t=>`<span class="pill g">${esc(t)}</span>`).join('')}
+ <div class="lbl">Хук</div><div><span class="hook">${esc(r.hook_ru)}</span></div>${r.hook_en?`<div style="font-size:12.5px;color:var(--mut);margin-top:3px">Оригинал: «${esc(r.hook_en)}»</div>`:''}
+ <details><summary>Разбор и текст</summary>${ok(r.structure)?`<div class="lbl">Структура</div><div>${esc(r.structure)}</div>`:''}${ok(r.why)?`<div class="lbl">Почему сработало (или нет)</div><div>${esc(r.why)}</div>`:''}${ok(r.core)?`<div class="lbl">Ядро</div><div><b>${esc(r.core)}.</b> ${ok(r.core_text)?esc(r.core_text):''}</div>`:''}${ok(r.adapt)?`<div class="lbl">Как забрать себе</div><div style="background:var(--warn);padding:8px 10px;border-radius:8px;border:1px solid #c9daf0">${esc(r.adapt)}</div>`:''}${r.caption?`<div class="lbl">Подпись</div><div class="tr">${esc(r.caption)}</div>`:''}${r.transcript?`<div class="lbl">Текст рилса (расшифровка начала)</div><div class="tr">${esc(r.transcript)}</div>`:''}</details>
+ <div style="margin-top:8px"><a class="ext" href="${r.url}" target="_blank" rel="noopener">Открыть в Instagram →</a></div></div></div>`}
+function renderExpert(h){const e=D.experts.find(x=>x.handle===h);if(!e)return renderHome();const rs=[...e.reels].sort((a,b)=>b.plays-a.plays);
+ app.innerHTML=`<span class="back" onclick="location.hash='razbory'">← Все разборы</span><h1>${esc(e.name)}</h1><p class="sub">@${e.handle} · ${esc(e.sample)}</p>
+ <div class="box"><h4>Кто это</h4>${esc(e.about)}</div><div class="box"><h4>Что продаёт и как</h4>${esc(e.sells)}</div><div class="box"><h4>Формула залётов</h4>${esc(e.formula)}</div><div class="box lesson"><h4>Что это значит для тебя</h4>${esc(e.lesson)}</div>
+ <h2>Рилсы — от лучшего к слабому</h2>${rs.map(reelCard).join('')}`;window.scrollTo(0,0)}
+function verdictOf(id){return marks[id]?.verdict||''}
+function renderCores(){const all=D.experts.flatMap(e=>e.reels).filter(r=>ok(r.core)&&ok(r.core_text));
+ const langOfR=r=>(D.experts.find(e=>e.handle===r.handle)||{}).lang;
+ let list=all.filter(r=>cur.lang==='all'||langOfR(r)===cur.lang).filter(r=>cur.filt==='all'||r.handle===cur.filt).filter(r=>cur.verdict==='all'?true:cur.verdict==='new'?!verdictOf(r.id):verdictOf(r.id)===cur.verdict).sort((a,b)=>b.x-a.x);
+ const cnt=k=>all.filter(r=>k==='new'?!verdictOf(r.id):verdictOf(r.id)===k).length;
+ app.innerHTML=`<h1>Библиотека ядер</h1><p class="sub">Ядро — смысл, который можно рассказать своими словами и своей историей. Отметь, что берёшь: по ядрам с отметкой «Беру» я буду писать сценарии и раскадровки. Комментарии сохраняются, я их читаю.</p>
+ <div class="filters"><span class="flab">Язык:</span>${[['all','Все'],['ru','Русскоязычные'],['en','Англоязычные']].map(([k,l])=>`<button class="chip ${cur.lang===k?'on':''}" data-lg="${k}">${l}</button>`).join('')}<span class="flab" style="margin-left:8px">Эксперт:</span><select id="exsel" class="s" style="border:1px solid var(--line);border-radius:999px;padding:6px 10px;font:inherit;font-size:13px;background:#fff"><option value="all">Все эксперты</option>${D.experts.filter(e=>cur.lang==='all'||e.lang===cur.lang).map(e=>`<option value="${e.handle}" ${cur.filt===e.handle?'selected':''}>${esc(e.name)}</option>`).join('')}</select></div>
+ <div class="filters">${[['all','Все',all.length],['new','Новые',cnt('new')],...V.map(([k,l])=>[k,l,cnt(k)])].map(([k,l,c])=>`<button class="chip ${cur.verdict===k?'on':''}" data-v="${k}">${l} · ${c}</button>`).join('')}</div>
+ ${db?'':'<p class="counts">Отметки сохраняются в вашем браузере.</p>'}
+ ${list.map(r=>{const v=verdictOf(r.id);return`<div class="box core"><h3>${esc(r.core)}</h3><span class="pill g">${esc(r.expert)}</span><span class="pill ${r.x>=2?'hot':''}">${fmt(r.plays)} · ×${r.x.toFixed(1)}</span>${r.tags.map(t=>`<span class="pill">${esc(t)}</span>`).join('')}
+ <p>${esc(r.core_text)}</p><p style="font-size:13px"><span style="color:var(--mut)">Как забрать себе:</span> ${esc(r.adapt)}</p><p style="font-size:13px"><span style="color:var(--mut)">Откуда:</span> «${esc(r.title)}» — <a class="ext" href="${r.url}" target="_blank" rel="noopener">рилс</a></p>
+ <div class="btns">${V.map(([k,l])=>`<button data-id="${r.id}" data-k="${k}" class="${v===k?'on'+(k==='take'?'':' no'):''}">${l}</button>`).join('')}</div>
+ <textarea data-c="${r.id}" placeholder="Комментарий, если есть (например: своя история — про первый заработок на ботах)">${esc(marks[r.id]?.comment||'')}</textarea><div class="saved" id="s-${r.id}"></div></div>`}).join('')||'<p class="counts">Здесь пока пусто.</p>'}
+ <p class="note">Ядра собраны из разобранных рилсов. Источник цифр — Instagram, 20.11.2026.</p>`;
+ app.querySelectorAll('[data-lg]').forEach(b=>b.onclick=()=>{cur.lang=b.dataset.lg;cur.filt='all';renderCores()});
+ const xs=document.getElementById('exsel');xs.onchange=()=>{cur.filt=xs.value;renderCores()};
+ app.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>{cur.verdict=b.dataset.v;renderCores()});
+ app.querySelectorAll('.btns button').forEach(b=>b.onclick=()=>{const id=b.dataset.id,k=b.dataset.k;const v=verdictOf(id)===k?'':k;save(id,{verdict:v});const y=scrollY;renderCores();scrollTo(0,y)});
+ app.querySelectorAll('textarea').forEach(t=>{let tm;t.oninput=()=>{clearTimeout(tm);tm=setTimeout(()=>save(t.dataset.c,{comment:t.value}),700)}})}
+async function save(id,patch){marks[id]={...(marks[id]||{}),...patch,updated:new Date().toISOString()};const s=document.getElementById('s-'+id);
+ if(!db){try{localStorage.setItem('reels_marks',JSON.stringify(marks));if(s){s.textContent='Сохранено в этом браузере';setTimeout(()=>s.textContent='',1500)}}catch(e){if(s)s.textContent='Не удалось сохранить'}return}
+ try{const r=D.experts.flatMap(e=>e.reels).find(x=>x.id===id);await db.collection('marks').doc(id).set({...marks[id],core:r.core,expert:r.expert});if(s){s.textContent='Сохранено';setTimeout(()=>s.textContent='',1500)}}catch(e){if(s)s.textContent='Не удалось сохранить'}}
+window.addEventListener('hashchange',route);
+app.innerHTML='<p class="sub" style="margin-top:30px">Загружаю базу…</p>';
+Promise.all([fetch('data.json').then(r=>r.json()),fetch('bloggers.json').then(r=>r.json())]).then(([d,b])=>{D=d;B=b;prep();route();}).catch(e=>{app.innerHTML='<p class="sub">Не удалось загрузить данные. Обновите страницу.</p>'});
+(async()=>{try{const c=window.claude;if(!c)return;db=await c.use('db');if(!db)return;
+ const snap=await db.collection('marks').get();(snap.docs||snap||[]).forEach(d=>{const data=d.data?d.data():d;const id=d.id||data.id;if(id)marks[id]=data});
+ if(D&&(location.hash.slice(1))==='yadra')renderCores()}catch(e){console.log('db',e)}})();
+</script></body></html>
