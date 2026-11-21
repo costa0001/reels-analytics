@@ -57,7 +57,7 @@ input.s{border:1px solid var(--line);border-radius:999px;padding:7px 12px;font:i
 <main class="wrap" id="app"></main>
 
 <script>
-function av(hd,nm,s){s=s||36;const L=esc(((nm||hd||'?').trim()[0]||'?').toUpperCase());return`<span class="av" style="width:${s}px;height:${s}px;font-size:${Math.round(s*.42)}px;background-image:url('avatars/${encodeURIComponent(hd)}.jpg')">${L}</span>`}
+function av(hd,nm,s){s=s||36;const L=esc(((nm||hd||'?').trim()[0]||'?').toUpperCase());return`<span class="av" style="width:${s}px;height:${s}px;font-size:${Math.round(s*.42)}px;background-image:url('avatars/${encodeURIComponent(hd)}.jpg'),url('https://costa0001.github.io/reels-analytics/avatars/${encodeURIComponent(hd)}.jpg')">${L}</span>`}
 let D,B,analyzed,bmap;
 try{const m=JSON.parse(localStorage.getItem('reels_marks')||'{}');if(m&&typeof m==='object')Object.assign(window,{_lm:m})}catch(e){}
 function prep(){
