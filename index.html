@@ -46,6 +46,7 @@ svg.sk{display:block;width:100%;height:auto;aspect-ratio:9/16;border-radius:10px
 .scn{border:1px solid var(--line);border-radius:12px;padding:10px;margin:10px 0;background:#fff}.scnh{margin-bottom:8px}.scnh .pnv{font-weight:500;margin-top:4px}
 .frs{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px}.frs.mini{grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:5px}.fr{cursor:pointer}.fr svg.sk{border-radius:8px}.fra{font-size:11px;color:var(--mut);line-height:1.25;margin-top:3px}
 .anbar{height:6px;background:#e3ebf6;border-radius:4px;margin-top:14px;overflow:hidden}.anbar i{display:block;height:100%;background:var(--btn)}
+.tprompt{background:#fffdf3;border:1px solid #efe3b5;border-radius:12px;padding:12px 14px;font-size:16px;line-height:1.5}.tprompt p{margin:6px 0}.tprompt .counts{font-size:12px}
 .psheet{display:none}
 #printarea{display:none}
 @media print{body.printing>*:not(#printarea){display:none!important}body.printing #printarea{display:block}.pslide{page-break-after:always;padding:10px}.pslide .slide{border:0;grid-template-columns:240px 1fr}.pn{break-inside:avoid}body.printing .psheet{display:block}.psheet .frs{grid-template-columns:repeat(6,1fr)}.psheet .fr{break-inside:avoid}}
@@ -254,9 +255,9 @@ function scriptView(rec,fresh){const o=rec.out||{};const sb=o.storyboard||[];
  ${o.idea?`<div class="lbl">Что берём из референса</div><div>${esc(o.idea)}</div>`:''}
  ${(o.hooks||[]).length?`<div class="lbl">Варианты хука</div><ol class="hk">${o.hooks.map(h=>`<li>${esc(h)}</li>`).join('')}</ol>`:''}
  ${(o.script||[]).length?`<div class="lbl">Сценарий (текст)</div><div class="scr">${o.script.map(s=>`<p><span class="pill">${esc(s.part||'')}</span> ${esc(s.text||'')}</p>`).join('')}</div>`:''}
- <div class="lbl">Раскадровка: кадр каждые ${String(FR_SEC).replace('.',',')} с</div>${sheetHTML(rec)}
+ <div class="lbl">Текст, который читает автор</div><div class="tprompt">${(()=>{const a=authorText(rec);return `<div class="counts">${a.wc} слов · ≈${Math.round(a.dur)} с</div>`+a.lines.map(x=>`<p><span class="counts">${fmtT(x.t[0])}</span> ${esc(x.v)}</p>`).join('')})()}<button class="sbtn" onclick="navigator.clipboard.writeText(authorText(scripts['${rec.id}']).all).then(()=>{this.textContent='Скопировано'})">Копировать текст для суфлёра</button></div><div class="lbl">Раскадровка: кадр каждые ${String(FR_SEC).replace('.',',')} с</div>${sheetHTML(rec)}
  ${o.cover?`<div class="lbl">Обложка</div><div><b>${esc(o.cover)}</b></div>`:''}${o.caption?`<div class="lbl">Подпись</div><div class="tr">${esc(o.caption)}</div>`:''}${o.props?`<div class="lbl">Подготовить к съёмке</div><div>${esc(o.props)}</div>`:''}
- <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">${fresh?`<button class="go" onclick="saveScript('${rec.id}')">Сохранить</button>`:`<button class="sbtn" onclick="delScript('${rec.id}')">Удалить</button>`}<button class="go" onclick="openAnim('${rec.id}')">▶ Смотреть в темпе ролика</button><button class="sbtn" onclick="openSlides('${rec.id}')">Слайды по сценам</button><button class="sbtn" onclick="printScript('${rec.id}')">PDF / печать</button><button class="sbtn" onclick="copyScript('${rec.id}')">Скопировать текстом</button><span class="counts" id="sv-${rec.id}"></span></div></div>`}
+ <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">${fresh?`<button class="go" onclick="saveScript('${rec.id}')">Сохранить</button>`:`<button class="sbtn" onclick="delScript('${rec.id}')">Удалить</button>`}<button class="go" onclick="openAnim('${rec.id}')">▶ Смотреть в темпе ролика</button><button class="sbtn" onclick="openSlides('${rec.id}')">Слайды по сценам</button><button class="sbtn" onclick="printScript('${rec.id}')">PDF / печать</button><button class="go" onclick="exportPack('${rec.id}')">⬇ Скачать для монтажа (ZIP)</button><button class="sbtn" onclick="copyJSON('${rec.id}')">Копировать JSON</button><button class="sbtn" onclick="copyScript('${rec.id}')">Скопировать текстом</button><span class="counts" id="sv-${rec.id}"></span></div></div>`}
 function copyScript(sid){const o=scripts[sid].out;const t=[o.title,'',...(o.hooks||[]).map((h,i)=>`Хук ${i+1}: ${h}`),'',...(o.script||[]).map(s=>`[${s.part}] ${s.text}`),'','РАСКАДРОВКА',...(o.storyboard||[]).map(s=>`Сцена ${s.n} (${s.time}, ${s.shot})\nВ кадре: ${s.visual}\nТекст: ${s.voice}\nТитр: ${s.onscreen}\nМонтаж: ${s.edit}`),'','КАДРЫ (по '+String(FR_SEC).replace('.',',')+' с)',...scFrames(scripts[sid]).map(f=>`#${f.idx+1} ${fmtT(f.t)} ${SK_PLANS[f.sk.plan]||''}${SK_CAM[f.sk.cam]?' / '+SK_CAM[f.sk.cam]:''} — «${f.sub}»${f.tx?' | титр: '+f.tx:''}${f.act?' | '+f.act:''}`),'','Обложка: '+(o.cover||''),'Подпись: '+(o.caption||'')].join('\n');
  navigator.clipboard.writeText(t).then(()=>{const s=document.getElementById('sv-'+sid);if(s)s.textContent='Скопировано'})}
 function renderScripts(){const L=Object.values(scripts).sort((a,b)=>String(b.created).localeCompare(String(a.created)));
@@ -418,6 +419,49 @@ function anStep(d){const [,F]=anFrames();AN.play=false;clearTimeout(AN.tm);AN.i=
 function anToggle(){const [,F]=anFrames();AN.play=!AN.play;if(AN.play&&AN.i>=F.length-1)AN.i=0;drawAnim();anTick()}
 function anKey(e){if(!document.getElementById('anm'))return document.removeEventListener('keydown',anKey);if(e.key==='ArrowRight')anStep(1);if(e.key==='ArrowLeft')anStep(-1);if(e.key===' '){e.preventDefault();anToggle()}if(e.key==='Escape')closeAnim()}
 function closeAnim(){clearTimeout(AN.tm);const m=document.getElementById('anm');if(m)m.remove();document.removeEventListener('keydown',anKey)}
+
+// ===== Экспорт раскадровки для монтажа (ZIP без внешних библиотек) =====
+const CRCT=(()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
+function crc32(u){let c=0xFFFFFFFF;for(let i=0;i<u.length;i++)c=CRCT[(c^u[i])&255]^(c>>>8);return (c^0xFFFFFFFF)>>>0}
+function zipStore(files){const enc=new TextEncoder();const parts=[],cent=[];let off=0;
+ for(const f of files){const name=enc.encode(f.name);const data=typeof f.data==='string'?enc.encode(f.data):f.data;const crc=crc32(data);
+  const h=new DataView(new ArrayBuffer(30));h.setUint32(0,0x04034b50,true);h.setUint16(4,20,true);h.setUint16(6,0x0800,true);h.setUint16(8,0,true);h.setUint32(14,crc,true);h.setUint32(18,data.length,true);h.setUint32(22,data.length,true);h.setUint16(26,name.length,true);
+  parts.push(new Uint8Array(h.buffer),name,data);
+  const c=new DataView(new ArrayBuffer(46));c.setUint32(0,0x02014b50,true);c.setUint16(4,20,true);c.setUint16(6,20,true);c.setUint16(8,0x0800,true);c.setUint32(16,crc,true);c.setUint32(20,data.length,true);c.setUint32(24,data.length,true);c.setUint16(28,name.length,true);c.setUint32(42,off,true);
+  cent.push(new Uint8Array(c.buffer),name);off+=30+name.length+data.length}
+ const cs=cent.reduce((a,b)=>a+b.length,0);const e=new DataView(new ArrayBuffer(22));e.setUint32(0,0x06054b50,true);e.setUint16(8,files.length,true);e.setUint16(10,files.length,true);e.setUint32(12,cs,true);e.setUint32(16,off,true);
+ return new Blob([...parts,...cent,new Uint8Array(e.buffer)],{type:'application/zip'})}
+function svgToPng(svg,w,h){return new Promise((res)=>{const img=new Image();img.onload=()=>{const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');x.drawImage(img,0,0,w,h);c.toBlob(b=>b.arrayBuffer().then(a=>res(new Uint8Array(a))),'image/jpeg',0.92)};img.onerror=()=>res(null);
+ img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg.replace('<svg ','<svg width="'+w+'" height="'+h+'" '))})}
+function srtT(t){const ms=Math.round(t*1000);const h=Math.floor(ms/3600000),m=Math.floor(ms/60000)%60,s=Math.floor(ms/1000)%60,r=ms%1000;const p=(n,l)=>String(n).padStart(l||2,'0');return `${p(h)}:${p(m)}:${p(s)},${p(r,3)}`}
+function slug(s){return String(s||'scenariy').toLowerCase().replace(/[^a-z0-9а-яё]+/gi,'-').replace(/^-|-$/g,'').slice(0,40)||'scenariy'}
+function authorText(rec){const o=rec.out||{},sb=o.storyboard||[];const tm=scTimes(sb,+((rec.params||{}).dur)||0);
+ const lines=sb.map((s,i)=>({t:tm[i],v:String(s.voice||'').trim(),e:s.visual||''})).filter(x=>x.v);
+ const all=lines.map(x=>x.v).join(' ');const wc=all.split(/\s+/).filter(Boolean).length;const dur=tm.length?tm[tm.length-1][1]:0;
+ return {all,wc,dur,lines,txt:[`ТЕКСТ ДЛЯ ЧТЕНИЯ — ${o.title||''}`,'',`${wc} слов · ≈${Math.round(dur)} с · темп ≈${dur?(wc/dur).toFixed(1):'—'} слова в секунду`,'Читай в камеру, живо. «/» — короткая пауза, новая строка — смена кадра/сцены.','',
+  '— ПО СЦЕНАМ —',...lines.map((x,i)=>`\n[${fmtT(x.t[0])}–${fmtT(x.t[1])}] Сцена ${i+1}${x.e?'  ('+x.e+')':''}\n${x.v.replace(/([,.;:!?—])\s+/g,'$1 / ')}`),'',
+  '— ЦЕЛИКОМ (для суфлёра) —','',all,'',(rec.params||{}).cw?`Не забудь кодовое слово в конце: ${rec.params.cw}`:''].join('\n')}}
+async function exportPack(sid){const rec=scripts[sid];const o=rec.out||{},p=rec.params||{};const F=scFrames(rec);const st=document.getElementById('sv-'+sid);const say=t=>{if(st)st.textContent=t};
+ say('Готовлю кадры… 0/'+F.length);
+ const frames=F.map(f=>({n:f.idx+1,file:`frames/${String(f.idx+1).padStart(3,'0')}.jpg`,start:f.t,end:+(f.t+FR_SEC).toFixed(2),duration:FR_SEC,scene:f.scene.n||f.si+1,plan:f.sk.plan,plan_ru:SK_PLANS[f.sk.plan]||'',camera:f.sk.cam,camera_ru:SK_CAM[f.sk.cam]||'статично',pose:f.sk.pose,emotion:f.sk.emotion,background:f.sk.bg,object:f.sk.obj,object_label:f.sk.obj_label||'',speech:f.sub,title_overlay:f.tx,action:f.act}));
+ const total=F.length?+(F[F.length-1].t+FR_SEC).toFixed(2):0;
+ const pack={format:'reels-storyboard',version:1,frame_seconds:FR_SEC,aspect:'9:16',resolution:[1080,1920],total_seconds:total,frames_count:F.length,
+  title:o.title,idea:o.idea,hooks:o.hooks,cover:o.cover,caption:o.caption,props:o.props,codeword:p.cw||'',topic:p.topic||'',offer:p.offer||'',tone:p.tone||'',
+  reference:{expert:rec.expert||'',handle:rec.handle||'',url:rec.ref_url||'',hook:rec.ref_hook||'',plays:rec.ref_plays||0,core:rec.core||''},script:o.script,scenes:o.storyboard,frames};
+ const files=[{name:'storyboard.json',data:JSON.stringify(pack,null,2)}];
+ files.unshift({name:'TEKST_DLYA_AVTORA.txt',data:authorText(rec).txt});
+ files.push({name:'subtitles.srt',data:frames.filter(f=>f.speech).map((f,i)=>`${i+1}\n${srtT(f.start)} --> ${srtT(f.end)}\n${f.speech}\n`).join('\n')});
+ files.push({name:'titles.srt',data:frames.filter(f=>f.title_overlay).map((f,i)=>`${i+1}\n${srtT(f.start)} --> ${srtT(f.end)}\n${f.title_overlay}\n`).join('\n')});
+ files.push({name:'edit_list.csv',data:'﻿'+['№;Старт;Конец;Сцена;План;Камера;Речь;Титр;Действие',...frames.map(f=>[f.n,f.start.toFixed(1),f.end.toFixed(1),f.scene,f.plan_ru,f.camera_ru,f.speech,f.title_overlay,f.action].map(x=>`"${String(x==null?'':x).replace(/"/g,'""')}"`).join(';'))].join('\r\n')});
+ const md=[`# ${o.title||'Сценарий'}`,'',`Длительность: ${total} с · ${F.length} кадров по ${FR_SEC} с · 9:16`,p.cw?`Кодовое слово: ${p.cw}`:'','','## Хуки',...(o.hooks||[]).map((h,i)=>`${i+1}. ${h}`),'','## Текст для чтения автором','',authorText(rec).all,'','## Структура текста',...(o.script||[]).map(s=>`**${s.part}.** ${s.text}`),'','## Сцены',...(o.storyboard||[]).map(s=>`### Сцена ${s.n} (${s.time})\n- План: ${s.shot}\n- В кадре: ${s.visual}\n- Говорит: ${s.voice}\n- Титр: ${s.onscreen}\n- Монтаж: ${s.edit}`),'','## Обложка',o.cover||'','','## Подпись',o.caption||'','','## Реквизит',o.props||'','','---','Как собрать: текст для записи — TEKST_DLYA_AVTORA.txt; кадры лежат в frames/ по порядку, каждый по 0,7 с; субтитры — subtitles.srt, титры — titles.srt; полное описание каждого кадра — storyboard.json и edit_list.csv.'].join('\n');
+ files.push({name:'README.md',data:md});
+ for(const f of F){const png=await svgToPng(frameSVG(rec,f),540,960);if(png)files.push({name:frames[f.idx].file,data:png});if(f.idx%8===0){say('Готовлю кадры… '+(f.idx+1)+'/'+F.length);await new Promise(r=>setTimeout(r,0))}}
+ const cov=await svgToPng(sketchSVG({sk:Object.assign({},((o.storyboard||[])[0]||{}).sk||{},{plan:'MCU',cam:'static'})},{text:o.cover||o.title||'',pos:'top',big:true,seed:rec.id}),540,960);if(cov)files.push({name:'cover.jpg',data:cov});
+ const blob=zipStore(files);const name=`raskadrovka-${slug(o.title)}.zip`;
+ try{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},4000);say('Архив '+name+' ('+Math.round(blob.size/1024)+' КБ) — если загрузка не началась, нажми «Копировать JSON»')}
+ catch(e){say('Браузер не дал скачать — скопирован storyboard.json');copyJSON(sid)}}
+function copyJSON(sid){const rec=scripts[sid];const F=scFrames(rec);const o=rec.out||{};const j=JSON.stringify({format:'reels-storyboard',version:1,frame_seconds:FR_SEC,title:o.title,script:o.script,scenes:o.storyboard,frames:F.map(f=>({n:f.idx+1,start:f.t,scene:f.scene.n||f.si+1,plan:f.sk.plan,camera:f.sk.cam,pose:f.sk.pose,speech:f.sub,title_overlay:f.tx,action:f.act}))},null,1);
+ navigator.clipboard.writeText(j).then(()=>{const s=document.getElementById('sv-'+sid);if(s)s.textContent='JSON раскадровки скопирован'})}
 
 // ===== Раскадровка слайдами + печать =====
 let SL={id:null,i:0};
