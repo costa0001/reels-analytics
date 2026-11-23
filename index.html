@@ -28,6 +28,20 @@ h1{font-size:30px;letter-spacing:-.03em;margin:28px 0 4px;font-weight:800}h2{fon
 .slh{display:flex;gap:10px;align-items:center;background:var(--bg);padding:6px 10px;font-size:13px}.slb{display:grid;grid-template-columns:150px 1fr;gap:12px;padding:10px;font-size:14px}
 .frame{aspect-ratio:9/16;background:#0b2a5b;color:#fff;border-radius:8px;display:flex;align-items:center;justify-content:center;text-align:center;padding:8px;font-weight:700;font-size:13px;line-height:1.25}
 @media(max-width:640px){.row3{grid-template-columns:1fr}.slb{grid-template-columns:90px 1fr}}
+.slmodal{position:fixed;inset:0;background:#f1f6fc;z-index:60;display:flex;flex-direction:column}
+.sltop{display:flex;justify-content:space-between;align-items:center;padding:10px 18px;border-bottom:1px solid var(--line);background:#fff}
+.slbody{flex:1;overflow:auto;display:flex;justify-content:center;align-items:flex-start;padding:18px}
+.slide{display:grid;grid-template-columns:minmax(200px,300px) minmax(260px,520px);gap:24px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px;max-width:900px;width:100%}
+.frame.big{position:relative;aspect-ratio:9/16;background:linear-gradient(160deg,#16386f,#0b2a5b);border-radius:14px;color:#fff;display:flex;align-items:center;justify-content:center;padding:14px;text-align:center}
+.fshot{position:absolute;top:10px;left:10px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;background:rgba(255,255,255,.16);padding:3px 8px;border-radius:999px}
+.ftxt{font-weight:800;font-size:20px;line-height:1.2;text-shadow:0 2px 8px rgba(0,0,0,.35)}
+.fvis{position:absolute;bottom:10px;left:10px;right:10px;font-size:11px;opacity:.75;line-height:1.3}
+.snote h2{margin:4px 0 6px}.voice{font-size:17px;line-height:1.45;background:var(--bg);border-radius:10px;padding:10px 12px}
+.slnav{display:flex;justify-content:center;align-items:center;gap:14px;padding:12px;border-top:1px solid var(--line);background:#fff}
+.dots{display:flex;gap:6px}.dots i{width:9px;height:9px;border-radius:50%;background:#c9daf0;cursor:pointer}.dots i.on{background:var(--btn)}
+#printarea{display:none}
+@media print{body.printing>*:not(#printarea){display:none!important}body.printing #printarea{display:block}.pslide{page-break-after:always;padding:10px}.pslide .slide{border:0;grid-template-columns:240px 1fr}}
+@media(max-width:640px){.slide{grid-template-columns:1fr}.frame.big{max-width:240px;margin:0 auto}}
 .exp h3{margin:0;font-size:17px}.handle{color:var(--mut);font-size:13px}
 .stats{display:flex;gap:16px;margin:12px 0 0;flex-wrap:wrap}.stat b{display:block;font-size:17px}.stat span{font-size:11.5px;color:var(--mut)}
 .box{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin:10px 0}
@@ -231,11 +245,39 @@ function scriptView(rec,fresh){const o=rec.out||{};const sb=o.storyboard||[];
  <div class="lbl">Раскадровка по сценам</div><div class="sbg">${sb.map(s=>`<div class="sl"><div class="slh"><b>Сцена ${esc(String(s.n||''))}</b><span>${esc(s.time||'')}</span><span class="pill">${esc(s.shot||'')}</span></div>
   <div class="slb"><div class="frame">${esc(s.onscreen||'')}</div><div><div><b>В кадре:</b> ${esc(s.visual||'')}</div><div><b>Текст:</b> ${esc(s.voice||'')}</div><div><b>Монтаж:</b> ${esc(s.edit||'')}</div></div></div></div>`).join('')}</div>
  ${o.cover?`<div class="lbl">Обложка</div><div><b>${esc(o.cover)}</b></div>`:''}${o.caption?`<div class="lbl">Подпись</div><div class="tr">${esc(o.caption)}</div>`:''}${o.props?`<div class="lbl">Подготовить к съёмке</div><div>${esc(o.props)}</div>`:''}
- <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">${fresh?`<button class="go" onclick="saveScript('${rec.id}')">Сохранить</button>`:`<button class="sbtn" onclick="delScript('${rec.id}')">Удалить</button>`}<button class="sbtn" onclick="copyScript('${rec.id}')">Скопировать текстом</button><span class="counts" id="sv-${rec.id}"></span></div></div>`}
+ <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">${fresh?`<button class="go" onclick="saveScript('${rec.id}')">Сохранить</button>`:`<button class="sbtn" onclick="delScript('${rec.id}')">Удалить</button>`}<button class="go" onclick="openSlides('${rec.id}')">▶ Раскадровка слайдами</button><button class="sbtn" onclick="printScript('${rec.id}')">PDF / печать</button><button class="sbtn" onclick="copyScript('${rec.id}')">Скопировать текстом</button><span class="counts" id="sv-${rec.id}"></span></div></div>`}
 function copyScript(sid){const o=scripts[sid].out;const t=[o.title,'',...(o.hooks||[]).map((h,i)=>`Хук ${i+1}: ${h}`),'',...(o.script||[]).map(s=>`[${s.part}] ${s.text}`),'','РАСКАДРОВКА',...(o.storyboard||[]).map(s=>`Сцена ${s.n} (${s.time}, ${s.shot})\nВ кадре: ${s.visual}\nТекст: ${s.voice}\nТитр: ${s.onscreen}\nМонтаж: ${s.edit}`),'','Обложка: '+(o.cover||''),'Подпись: '+(o.caption||'')].join('\n');
  navigator.clipboard.writeText(t).then(()=>{const s=document.getElementById('sv-'+sid);if(s)s.textContent='Скопировано'})}
 function renderScripts(){const L=Object.values(scripts).sort((a,b)=>String(b.created).localeCompare(String(a.created)));
  app.innerHTML=`<h1>Сценарии и раскадровки</h1><p class="sub">Сценарии, написанные по ядрам вирусных роликов. Новый сценарий — кнопка «✍️ Сценарий и раскадровка» у любого ролика в «Разборах» или «Библиотеке ядер».</p>
  ${L.length?L.map(r=>`<details class="box" style="display:block"><summary><b>${esc((r.out||{}).title||'Сценарий')}</b> <span class="counts">· ${esc(r.expert)} · ${new Date(r.created).toLocaleDateString('ru')}</span></summary>${scriptView(r,false)}</details>`).join(''):'<p class="counts">Пока нет сохранённых сценариев.</p>'}`}
+
+// ===== Раскадровка слайдами + печать =====
+let SL={id:null,i:0};
+function slideHTML(rec,i){const o=rec.out||{},sb=o.storyboard||[],n=sb.length+2;
+ if(i===0)return `<div class="slide cover"><div class="frame big"><div class="fshot">ОБЛОЖКА</div><div class="ftxt">${esc(o.cover||o.title||'')}</div></div>
+  <div class="snote"><div class="counts">Слайд 1 из ${n}</div><h2>${esc(o.title||'Сценарий')}</h2><div class="lbl">Идея</div><div>${esc(o.idea||'')}</div>
+  <div class="lbl">Хуки на выбор</div><ol class="hk">${(o.hooks||[]).map(x=>`<li>${esc(x)}</li>`).join('')}</ol>
+  <div class="lbl">Референс</div><div>${esc(rec.expert)} · ${fmt(rec.ref_plays)} просм. · ядро «${esc(rec.core||'')}»</div>
+  ${o.props?`<div class="lbl">Подготовить</div><div>${esc(o.props)}</div>`:''}</div></div>`;
+ if(i===n-1)return `<div class="slide"><div class="frame big"><div class="fshot">ФИНАЛ</div><div class="ftxt">${esc((rec.params||{}).cw?('Пиши «'+rec.params.cw+'»'):'Призыв')}</div></div>
+  <div class="snote"><div class="counts">Слайд ${n} из ${n}</div><h2>Публикация</h2><div class="lbl">Подпись к рилсу</div><div class="tr">${esc(o.caption||'')}</div>
+  <div class="lbl">Полный текст</div><div class="scr">${(o.script||[]).map(s=>`<p><span class="pill">${esc(s.part||'')}</span> ${esc(s.text||'')}</p>`).join('')}</div></div></div>`;
+ const s=sb[i-1];return `<div class="slide"><div class="frame big"><div class="fshot">${esc(s.shot||'')}</div><div class="ftxt">${esc(s.onscreen||'')}</div><div class="fvis">${esc(s.visual||'')}</div></div>
+  <div class="snote"><div class="counts">Слайд ${i+1} из ${n} · сцена ${esc(String(s.n||i))} · ${esc(s.time||'')}</div>
+  <div class="lbl">Что говорю</div><div class="voice">${esc(s.voice||'')}</div>
+  <div class="lbl">Что в кадре</div><div>${esc(s.visual||'')}</div>
+  <div class="lbl">Титр на экране</div><div><b>${esc(s.onscreen||'—')}</b></div>
+  <div class="lbl">Монтаж</div><div>${esc(s.edit||'')}</div></div></div>`}
+function openSlides(sid){SL={id:sid,i:0};let m=document.getElementById('slm');if(m)m.remove();m=document.createElement('div');m.id='slm';m.className='slmodal';document.body.appendChild(m);drawSlide();document.addEventListener('keydown',slKey)}
+function slKey(e){if(!document.getElementById('slm'))return document.removeEventListener('keydown',slKey);if(e.key==='ArrowRight')slGo(1);if(e.key==='ArrowLeft')slGo(-1);if(e.key==='Escape')closeSlides()}
+function slGo(d){const rec=scripts[SL.id];const n=(rec.out.storyboard||[]).length+2;SL.i=Math.max(0,Math.min(n-1,SL.i+d));drawSlide()}
+function closeSlides(){const m=document.getElementById('slm');if(m)m.remove();document.removeEventListener('keydown',slKey)}
+function drawSlide(){const rec=scripts[SL.id];const n=(rec.out.storyboard||[]).length+2;const m=document.getElementById('slm');
+ m.innerHTML=`<div class="sltop"><b>${esc(rec.out.title||'Раскадровка')}</b><span><button class="sbtn" onclick="printScript('${rec.id}')">PDF / печать</button> <span class="x" onclick="closeSlides()">✕</span></span></div>
+ <div class="slbody">${slideHTML(rec,SL.i)}</div>
+ <div class="slnav"><button class="sbtn" onclick="slGo(-1)" ${SL.i===0?'disabled':''}>← Назад</button><span class="dots">${Array.from({length:n},(_,k)=>`<i class="${k===SL.i?'on':''}" onclick="SL.i=${k};drawSlide()"></i>`).join('')}</span><button class="go" onclick="slGo(1)" ${SL.i===n-1?'disabled':''}>Дальше →</button></div>`}
+function printScript(sid){const rec=scripts[sid];const n=(rec.out.storyboard||[]).length+2;let p=document.getElementById('printarea');if(!p){p=document.createElement('div');p.id='printarea';document.body.appendChild(p)}
+ p.innerHTML=Array.from({length:n},(_,k)=>`<div class="pslide">${slideHTML(rec,k)}</div>`).join('');document.body.classList.add('printing');setTimeout(()=>{window.print();setTimeout(()=>document.body.classList.remove('printing'),500)},100)}
 
 </script></body></html>
